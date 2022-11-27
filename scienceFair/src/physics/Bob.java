@@ -83,7 +83,7 @@ public class Bob {
      * Corrects for values greater than 2pi or less than 0.
      * @param _theta The angle to set. Can be any double value. 
      */
-    public void setAngle(double _theta) {
+    public void setTheta(double _theta) {
         if (_theta < 0)
         {
             int revolutions = (int) (_theta / (2 * Math.PI)) + 1;
@@ -96,14 +96,14 @@ public class Bob {
      * Get the angle of the bob
      * @return The current angle. 
      */
-    public double getAngle() {
+    public double getTheta() {
         return theta;
     }
     /**
      * Get the angular velocity of the bob
      * @return The current angle. 
      */
-    public double getAngularVelocity() {
+    public double getThetaPrime() {
         return thetaPrime;
     }
 
@@ -112,12 +112,12 @@ public class Bob {
      * Corrects for values greater than 2pi or less than 0.
      * @param _theta The angle to set. Can be any double value. 
      */
-    public void setAngularVelocity(double _thetaPrime) {
+    public void setThetaPrime(double _thetaPrime) {
         thetaPrime = _thetaPrime;
     }
 
     /**
-     * Set the length of the rod connectin this bob to its center.
+     * Set the length of the rod connection this bob to its center.
      * @param _rodLength The new length of the rod.
      * @throws Exception If the new length is not positive (Len <= 0).
      */
@@ -234,7 +234,7 @@ public class Bob {
      */
     public void tickAngle(double tickTime)
     {
-        theta += thetaPrime;
+        theta += thetaPrime * tickTime;
         theta %= 2 * Math.PI;
         if (theta < 0) theta += 2 * Math.PI;
     }
