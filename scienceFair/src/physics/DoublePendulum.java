@@ -10,8 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
-import math.AbstractSolverMethod;
-import math.EulersMethod;
+import math.*;
 
 /**
  * Double Pendulum Simulation. 
@@ -56,8 +55,8 @@ public class DoublePendulum {
     {
         bob1 = new Bob(l1, m1);
         bob2 = new Bob(l2, m2);
-        bob1.setTheta(1);
-        bob2.setTheta(0);
+        bob1.setTheta(Math.PI);
+        bob2.setTheta(Math.PI);
         bob2.setTheta(-0.001);
 
         frame = new JFrame();
@@ -67,7 +66,7 @@ public class DoublePendulum {
         frame.setTitle("Double Pendulum Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		solver = new EulersMethod(new ODE());
+		solver = new ModifiedEulersMethod(new ODE());
     }
     
     /**
@@ -248,7 +247,6 @@ public class DoublePendulum {
     public void render()
     {
         frame.repaint();
-    	System.out.println(toString());
     }
 
     /**
@@ -271,10 +269,11 @@ public class DoublePendulum {
 
     public static void main(String[] args) throws Exception
     {
-        DoublePendulum p = new DoublePendulum(2, 1.0, 1.5, 3.0);
+        DoublePendulum p = new DoublePendulum(4, 1.0, 1.5, 3.0);
         p.loop();
     }
     
+    @Override
     public String toString()
     {
     	String out = "DoublePendulum{Bob1: " + 

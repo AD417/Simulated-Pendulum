@@ -12,6 +12,10 @@ public final class Config
 	 */
 	public static double tickSize = 1;
 	
+	/**
+	 * Whether or not the value of theta in a simulation should 
+	 * remain between 0 and 2pi. 
+	 */
 	public static final boolean constrainTheta = false;
 	
 	/**

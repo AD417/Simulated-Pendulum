@@ -298,6 +298,7 @@ public class Bob {
         g.fillOval((int)pos[0] - 10, (int)pos[1] - 10, 20, 20);
     }
 
+    @Override
     public String toString()
     {
         DecimalFormat f = new DecimalFormat("0.00");

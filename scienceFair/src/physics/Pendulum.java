@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.Timer;
 
 import math.AbstractSolverMethod;
-import math.EulersMethod;
+import math.ModifiedEulersMethod;
 
 /**
  * Single Pendulum Simulation. <br>
@@ -54,7 +54,7 @@ public class Pendulum
         frame.setTitle("Pendulum Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		solver = new EulersMethod(new ODE());
+		solver = new ModifiedEulersMethod(new ODE());
     }
     
     /**
@@ -282,5 +282,14 @@ public class Pendulum
     {
         Pendulum p = new Pendulum(3, 5);
         p.loop();
+    }
+    
+    @Override
+    public String toString()
+    {
+    	String out = "DoublePendulum{Bob: " + 
+    			bob.toString() +
+    			"}";
+    	return out;
     }
 }
