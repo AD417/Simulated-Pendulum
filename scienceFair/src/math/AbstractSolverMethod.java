@@ -1,12 +1,12 @@
 package math;
 
-import physics.Pendulum.ODE;
+import physics.AbstractODE;
 
 public abstract class AbstractSolverMethod {
 	
-	ODE ode;
+	AbstractODE ode;
 	
-	public AbstractSolverMethod(ODE _ode)
+	public AbstractSolverMethod(AbstractODE _ode)
 	{
 		ode = _ode;
 	}

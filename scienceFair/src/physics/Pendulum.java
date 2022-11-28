@@ -6,6 +6,14 @@ import java.awt.event.*;
 
 import math.*;
 
+/**
+ * Single Pendulum Simulation. <br>
+ * <br>
+ * Given a single pendulum bob on a massless rod, model 
+ * how that bob rotates around its fixed pivot point over time. 
+ * @author AD417
+ *
+ */
 public class Pendulum 
 {
     /**
@@ -25,6 +33,7 @@ public class Pendulum
      */
     int ticks = 0;
 
+    boolean isRendering = false;
 
     public Pendulum(double rodLength, double mass) throws Exception
     {
@@ -45,15 +54,16 @@ public class Pendulum
      * Rendering routine for the simulation.
      * This might be the worst part about this whole thing. I don't yet
      * fully understand the implications / utilities of nested classes.
+     * @author AD417
      */
     class Render extends JComponent
     {
     	// Not sure what this is for; Eclipse forced me to add it. 
         private static final long serialVersionUID = -3551534785177435875L;
-		boolean isDone = true;
         public void paintComponent(Graphics g)
         {
-            if (!isDone) return;
+            if (isRendering) return;
+            isRendering = true;
             Graphics2D g2 = (Graphics2D) g;
 
             g.setColor(Color.white);
@@ -61,13 +71,29 @@ public class Pendulum
             g.setColor(Color.black);
             bob.drawLine(g2);
             bob.drawBob(g2);
+            isRendering = false;
         }
     }
     
-    public class ODE
+    /**
+     * Half of a differential equation solver. The other half can be 
+     * changed as needed while the simulation runs. <br>
+     * <br>
+     * Collects data points relevant for the equation solving in one
+     * place, and allows for their manipulation. 
+     * @author AD417<br>
+     * Based on code written by myphysicslab:
+     * {@link https://github.com/myphysicslab/myphysicslab/blob/c47ed29a4d79a449e2a673e6ff788227b7a53bf0/src/sims/pendulum/PendulumSim.js}
+     *
+     */
+    public class ODE extends AbstractODE
     {
+    	public ODE(){}
+    	
     	/**
-    	 * The important variables in this simulation, 
+    	 * Update the state of this nested class to align with the current
+    	 * state of the sim. 
+    	 * @return A container for the important variables in this simulation, 
     	 * packaged for convenient use in other parts of the code. <br>
     	 * <br>
     	 * For a pendulum, they are stored as: <br>
@@ -79,14 +105,10 @@ public class Pendulum
     	 * 5. Potential Energy <br>
     	 * 6. Total Energy  <br>
     	 */
-    	public double[] vars = new double[7];
-    	
-    	/**
-    	 * Update the state of this nested class to align with the current
-    	 * state of the sim. 
-    	 */
-    	public void updateVars()
+    	@Override
+    	public double[] getVars()
     	{
+    		double[] vars = new double[7];
     		// Angle
     		vars[0] = bob.theta;
     		// Angular velocity
@@ -101,17 +123,8 @@ public class Pendulum
     		vars[5] = bob.getPotentialEnergy();
     		// Total Energy
     		vars[6] = vars[4] + vars[5];
-    	}
-    	
-    	/**
-    	 * Determine the change in the state of the current state of the
-    	 * simulation. 
-    	 * @param timeStep
-    	 * @return
-    	 */
-    	public double[] evaluateThisChange(double timeStep)
-    	{
-    		return evaluateChange(vars, timeStep);
+    		
+    		return vars;
     	}
     	
     	/**
@@ -126,6 +139,7 @@ public class Pendulum
     	 * @param timeStep ???
     	 * @return the change in the state of the provided simulation.
     	 */
+    	@Override
     	public double[] evaluateChange(double[] current, double timeStep)
     	{
     		double[] change = new double[current.length];
@@ -136,6 +150,7 @@ public class Pendulum
     		return change;
     	}
     	
+    	@Override
     	public void setVars(double[] _vars)
     	{
     		// if (_vars.length != vars.length) throw new Exception("Invalid sim configuration!");
