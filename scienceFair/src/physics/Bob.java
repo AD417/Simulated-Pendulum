@@ -17,7 +17,7 @@ public class Bob {
     /**
      * Angle off from the lowest point. Default 3.1415...
      */
-    double theta = Math.PI ;
+    double theta = 0;
 
     /**
      * Change in angle per second.
@@ -92,6 +92,10 @@ public class Bob {
 	            _theta -= revolutions * 2 * Math.PI;
 	        }
 	        theta = _theta % (2 * Math.PI);
+    	}
+    	else 
+    	{
+    		theta = _theta;
     	}
     }
 
@@ -280,8 +284,8 @@ public class Bob {
         double[] pos = getPosition();
         for (int i = 0; i < 2; i++)
         {
-            center[i] = 50 * center[i] + 250;
-            pos[i] = 50 * pos[i] + 250;
+            center[i] = -50 * center[i] + 250;
+            pos[i] = -50 * pos[i] + 250;
         }
         g.draw(new Line2D.Double(center[0], center[1], pos[0], pos[1]));
     }
@@ -289,9 +293,8 @@ public class Bob {
     public void drawBob(Graphics2D g)
     {
         double[] pos = getPosition();
-        pos[1] = 50 * pos[1] + 250;
-        pos[0] = 50 * pos[0] + 250;
-        System.out.println(pos[1]);
+        pos[1] = -50 * pos[1] + 250;
+        pos[0] = -50 * pos[0] + 250;
         g.fillOval((int)pos[0] - 10, (int)pos[1] - 10, 20, 20);
     }
 

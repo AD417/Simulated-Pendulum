@@ -12,7 +12,7 @@ public final class Config
 	 */
 	public static double tickSize = 1;
 	
-	public static final boolean constrainTheta = true;
+	public static final boolean constrainTheta = false;
 	
 	/**
 	 * The framerate of the simulation Hardcoded to 40fps.

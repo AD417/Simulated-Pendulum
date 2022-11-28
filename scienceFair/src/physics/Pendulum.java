@@ -149,7 +149,7 @@ public class Pendulum
     	{
     		double[] change = new double[current.length];
     		change[0] = current[1];
-    		change[1] = (Config.gravity / bob.rodLength) * Math.sin(current[0]);
+    		change[1] = -(Config.gravity / bob.rodLength) * Math.sin(current[0]);
     		change[2] = 1;
     		change[3] = 0;
     		return change;
