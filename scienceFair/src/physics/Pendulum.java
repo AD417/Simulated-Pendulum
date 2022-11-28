@@ -4,6 +4,8 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 
+import math.*;
+
 public class Pendulum 
 {
     /**
@@ -15,6 +17,8 @@ public class Pendulum
      * The screen the simulation is rendered on. 
      */
     JFrame frame;
+    
+    AbstractSolverMethod solver;
 
     /**
      * The number of frames that have already been drawn.
@@ -25,7 +29,7 @@ public class Pendulum
     public Pendulum(double rodLength, double mass) throws Exception
     {
         bob = new Bob(rodLength, mass);
-        bob.setThetaPrime(0.1);
+        bob.setThetaPrime(1);
 
         frame = new JFrame();
         frame.add(new Render());
@@ -33,6 +37,8 @@ public class Pendulum
 		frame.setVisible(true);
         frame.setTitle("Pendulum Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		solver = new EulersMethod(new ODE());
     }
     
     /**
@@ -58,6 +64,87 @@ public class Pendulum
         }
     }
     
+    public class ODE
+    {
+    	/**
+    	 * The important variables in this simulation, 
+    	 * packaged for convenient use in other parts of the code. <br>
+    	 * <br>
+    	 * For a pendulum, they are stored as: <br>
+    	 * 0. Angle / Theta <br>
+    	 * 1. Angular velocity / ThetaPrime <br>
+    	 * 2. Time <br>
+    	 * 3. Angular Acceleration / Theta'' <br>
+    	 * 4. Kinetic Energy <br>
+    	 * 5. Potential Energy <br>
+    	 * 6. Total Energy  <br>
+    	 */
+    	public double[] vars = new double[7];
+    	
+    	/**
+    	 * Update the state of this nested class to align with the current
+    	 * state of the sim. 
+    	 */
+    	public void updateVars()
+    	{
+    		// Angle
+    		vars[0] = bob.theta;
+    		// Angular velocity
+    		vars[1] = bob.thetaPrime;
+    		// Time
+    		vars[2] = ticks * Config.tickSize * 0.001;
+    		// Angular Acceleration
+    		vars[3] = 0;
+    		// Kinetic Energy
+    		vars[4] = bob.getKineticEnergy();
+    		// Potential Energy
+    		vars[5] = bob.getPotentialEnergy();
+    		// Total Energy
+    		vars[6] = vars[4] + vars[5];
+    	}
+    	
+    	/**
+    	 * Determine the change in the state of the current state of the
+    	 * simulation. 
+    	 * @param timeStep
+    	 * @return
+    	 */
+    	public double[] evaluateThisChange(double timeStep)
+    	{
+    		return evaluateChange(vars, timeStep);
+    	}
+    	
+    	/**
+    	 * Determine the change in the state of the simulation, given the 
+    	 * provided current state. <br>
+    	 * <br>
+    	 * Note that said current state may not
+    	 * be the current state as stored in {@link vars}. <br>
+    	 * To determine the change in the current state, use
+    	 * {@link Pendulum.evaluateThisChange} instead. 
+    	 * @param current the state of the simulation to evaluate.
+    	 * @param timeStep ???
+    	 * @return the change in the state of the provided simulation.
+    	 */
+    	public double[] evaluateChange(double[] current, double timeStep)
+    	{
+    		double[] change = new double[current.length];
+    		change[0] = current[1];
+    		change[1] = (Config.gravity / bob.rodLength) * Math.sin(current[0]);
+    		change[2] = 1;
+    		change[3] = 0;
+    		return change;
+    	}
+    	
+    	public void setVars(double[] _vars)
+    	{
+    		// if (_vars.length != vars.length) throw new Exception("Invalid sim configuration!");
+    		bob.setTheta(_vars[0]);
+    		bob.thetaPrime = _vars[1];
+    		
+    	}
+    }
+    
     
     /**
      * Set the angle of the Bob. 
@@ -75,7 +162,7 @@ public class Pendulum
      */
     public double getTheta()
     {
-    	return bob.getTheta();
+    	return bob.theta;
     }
     
     /**
@@ -94,7 +181,7 @@ public class Pendulum
      */
     public double getThetaPrime()
     {
-    	return bob.getThetaPrime();
+    	return bob.thetaPrime;
     }
     
     /**
@@ -113,7 +200,7 @@ public class Pendulum
      */
     public double getLength()
     {
-        return bob.getLength();
+        return bob.rodLength;
     }
     
     /**
@@ -132,7 +219,7 @@ public class Pendulum
      */
     public double getMass()
     {
-        return bob.getMass();
+        return bob.mass;
     }
     
     
@@ -143,7 +230,8 @@ public class Pendulum
      */
     public void tick(double tickTime)
     {
-        bob.tickAngle(tickTime / 1000);
+        // bob.tickAngle(tickTime / 1000);
+    	solver.step(tickTime);
     }
 
     /**
@@ -163,7 +251,7 @@ public class Pendulum
     	Timer timer = new Timer((int) Config.tickSize, new ActionListener() {
     	    @Override
     	    public void actionPerformed(ActionEvent e) {
-    	        tick(Config.tickSize);
+    	        tick(Config.tickSize / 1000);
     	        if (++ticks % 25 == 0) render();
     	    }
     	});

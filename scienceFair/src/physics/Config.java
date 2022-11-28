@@ -1,6 +1,6 @@
 package physics;
 
-public class Config 
+public final class Config 
 {
 	/**
 	 * The force of gravity in this simulation. Default 9.81m/s^2
@@ -11,4 +11,9 @@ public class Config
 	 * The length of time that a single tick takes. Default 1ms. 
 	 */
 	public static double tickSize = 1;
+	
+	/**
+	 * The framerate of the simulation Hardcoded to 40fps.
+	 */
+	public static final double FPS = 40;
 }

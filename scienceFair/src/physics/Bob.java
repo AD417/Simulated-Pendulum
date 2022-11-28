@@ -15,9 +15,9 @@ public class Bob {
     double centerY = 0;
 
     /**
-     * Angle off from the lowest point. Default 0.0
+     * Angle off from the lowest point. Default 3.1415...
      */
-    double theta = 0;
+    double theta = Math.PI ;
 
     /**
      * Change in angle per second.
@@ -156,6 +156,8 @@ public class Bob {
         return mass;
     }
 
+    // Non-stored getters:
+    
     /**
      * Calculate the lowest possible height that this bob can be, 
      * given its current center. 
@@ -224,9 +226,29 @@ public class Bob {
     {
         return mass * 9.81 * (height + rodLength * getYDisplacement());
     }
+    
+    /**
+     * Calculate the tangential velocity of the bob.
+     * @return the tangential velocity of the bob. 
+     */
+    public double getVelocity() 
+    {
+    	// v = 2 * pi * r * w
+    	return 2 * Math.PI * rodLength * thetaPrime;
+    }
 
+    /**
+     * Calculate the kinetic energy of the bob. 
+     * @return the kinetic energy of the bob. 
+     */
+    public double getKineticEnergy()
+    {
+    	// KE = 1/2 * m * v^2
+    	double v = getVelocity();
+    	return 0.5 * mass * v * v;
+    }
 
-    // BEGIN METHODS
+    // Modifying methods:
 
     /**
      * Change the current angle based on the current angular velocity.
@@ -253,7 +275,7 @@ public class Bob {
         for (int i = 0; i < 2; i++)
         {
             center[i] = 50 * center[i] + 250;
-            pos[i] = -50 * pos[i] + 250;
+            pos[i] = 50 * pos[i] + 250;
         }
         g.draw(new Line2D.Double(center[0], center[1], pos[0], pos[1]));
     }
@@ -261,8 +283,8 @@ public class Bob {
     public void drawBob(Graphics2D g)
     {
         double[] pos = getPosition();
-        pos[0] = -50 * pos[0] + 250;
-        pos[1] = -50 * pos[1] + 250;
+        pos[1] = 50 * pos[1] + 250;
+        pos[0] = 50 * pos[0] + 250;
         g.fillOval((int)pos[0] - 10, (int)pos[1] - 10, 20, 20);
     }
 
