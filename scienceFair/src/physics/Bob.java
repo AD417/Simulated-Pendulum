@@ -84,12 +84,15 @@ public class Bob {
      * @param _theta The angle to set. Can be any double value. 
      */
     public void setTheta(double _theta) {
-        if (_theta < 0)
-        {
-            int revolutions = (int) (_theta / (2 * Math.PI)) + 1;
-            _theta -= revolutions * 2 * Math.PI;
-        }
-        theta = _theta % (2 * Math.PI) ;
+    	if (Config.constrainTheta)
+    	{
+	        if (_theta < 0)
+	        {
+	            int revolutions = (int) (_theta / (2 * Math.PI)) + 1;
+	            _theta -= revolutions * 2 * Math.PI;
+	        }
+	        theta = _theta % (2 * Math.PI);
+    	}
     }
 
     /**
@@ -257,8 +260,11 @@ public class Bob {
     public void tickAngle(double tickTime)
     {
         theta += thetaPrime * tickTime;
-        theta %= 2 * Math.PI;
-        if (theta < 0) theta += 2 * Math.PI;
+        if (Config.constrainTheta) 
+        {
+	        theta %= 2 * Math.PI;
+	        if (theta < 0) theta += 2 * Math.PI;
+        }
     }
 
     /**

@@ -92,7 +92,9 @@ public class DoublePendulum {
             g.setColor(Color.black);
             bob1.drawLine(g2);
             bob2.drawLine(g2);
+            g.setColor(Color.red);
             bob1.drawBob(g2);
+            g.setColor(Color.blue);
             bob2.drawBob(g2);
             isRendering = false;
         }
@@ -221,9 +223,9 @@ public class DoublePendulum {
     	public void setVars(double[] vars)
     	{
     		// if (_vars.length != vars.length) throw new Exception("Invalid sim configuration!");
-    		bob1.theta = vars[0];
+    		bob1.setTheta(vars[0]);
     		bob1.thetaPrime = vars[1];
-    		bob2.theta = vars[2];
+    		bob2.setTheta(vars[2]);
     		bob2.thetaPrime = vars[3];
     		
     		bob2.setCenter(bob1.getX(), bob1.getY());
