@@ -285,6 +285,7 @@ public class Bob {
         double[] pos = getPosition();
         pos[1] = 50 * pos[1] + 250;
         pos[0] = 50 * pos[0] + 250;
+        System.out.println(pos[1]);
         g.fillOval((int)pos[0] - 10, (int)pos[1] - 10, 20, 20);
     }
 

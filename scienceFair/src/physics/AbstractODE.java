@@ -25,8 +25,6 @@ public abstract class AbstractODE {
 	 * Determine the change in the state of the simulation, given the 
 	 * provided current state. <br>
 	 * <br>
-	 * Note that said current state might not
-	 * be the current state as stored in {@link vars}. <br>
 	 * @param current the state of the simulation to evaluate.
 	 * @param timeStep an indicator of how much time has passed 
 	 * since the true current state.
@@ -39,6 +37,6 @@ public abstract class AbstractODE {
 	 * the solver. 
 	 * @param _vars the new state of the sim. 
 	 */
-	public abstract void setVars(double[] _vars);
+	public abstract void setVars(double[] vars);
 	
 }

@@ -1,10 +1,17 @@
 package physics;
 
-import java.awt.*;
-import javax.swing.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import math.*;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.Timer;
+
+import math.AbstractSolverMethod;
+import math.EulersMethod;
 
 /**
  * Single Pendulum Simulation. <br>
@@ -70,6 +77,7 @@ public class Pendulum
             g.fillRect(0, 0, 500, 500);
             g.setColor(Color.black);
             bob.drawLine(g2);
+            g.setColor(Color.blue);
             bob.drawBob(g2);
             isRendering = false;
         }
@@ -91,8 +99,7 @@ public class Pendulum
     	public ODE(){}
     	
     	/**
-    	 * Update the state of this nested class to align with the current
-    	 * state of the sim. 
+    	 * Compile a list containing all the important variables in this sim.
     	 * @return A container for the important variables in this simulation, 
     	 * packaged for convenient use in other parts of the code. <br>
     	 * <br>
@@ -133,8 +140,6 @@ public class Pendulum
     	 * <br>
     	 * Note that said current state may not
     	 * be the current state as stored in {@link vars}. <br>
-    	 * To determine the change in the current state, use
-    	 * {@link Pendulum.evaluateThisChange} instead. 
     	 * @param current the state of the simulation to evaluate.
     	 * @param timeStep ???
     	 * @return the change in the state of the provided simulation.
@@ -151,11 +156,11 @@ public class Pendulum
     	}
     	
     	@Override
-    	public void setVars(double[] _vars)
+    	public void setVars(double[] vars)
     	{
     		// if (_vars.length != vars.length) throw new Exception("Invalid sim configuration!");
-    		bob.setTheta(_vars[0]);
-    		bob.thetaPrime = _vars[1];
+    		bob.setTheta(vars[0]);
+    		bob.thetaPrime = vars[1];
     		
     	}
     }
