@@ -58,6 +58,7 @@ public class DoublePendulum {
         bob1.setTheta(Math.PI);
         bob2.setTheta(Math.PI);
         bob2.setTheta(-0.001);
+		bob2.setCenter(bob1.getPosition());
 
         frame = new JFrame();
         frame.add(new Render());
@@ -86,9 +87,9 @@ public class DoublePendulum {
             isRendering = true;
             Graphics2D g2 = (Graphics2D) g;
 
-            g.setColor(Color.white);
+            g.setColor(new Color(0xFF000000, true));
             g.fillRect(0, 0, 500, 500);
-            g.setColor(Color.black);
+            g.setColor(Color.white);
             bob1.drawLine(g2);
             bob2.drawLine(g2);
             g.setColor(Color.red);
@@ -227,7 +228,7 @@ public class DoublePendulum {
     		bob2.setTheta(vars[2]);
     		bob2.thetaPrime = vars[3];
     		
-    		bob2.setCenter(bob1.getX(), bob1.getY());
+    		bob2.setCenter(bob1.getPosition());
     	}
     }
 

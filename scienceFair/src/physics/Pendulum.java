@@ -10,8 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
-import math.AbstractSolverMethod;
-import math.ModifiedEulersMethod;
+import math.*;
 
 /**
  * Single Pendulum Simulation. <br>
@@ -54,7 +53,7 @@ public class Pendulum
         frame.setTitle("Pendulum Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		solver = new ModifiedEulersMethod(new ODE());
+		solver = new RungeKutta(new ODE());
     }
     
     /**
@@ -250,7 +249,6 @@ public class Pendulum
      */
     public void tick(double tickTime)
     {
-        // bob.tickAngle(tickTime / 1000);
     	solver.step(tickTime);
     }
 

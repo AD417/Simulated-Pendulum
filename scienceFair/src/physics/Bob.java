@@ -67,6 +67,16 @@ public class Bob {
         centerX = x;
         centerY = y;
     }
+    
+    /**
+     * Set the new center of the circle this bob rotates around.
+     * @param pos a pair of doubles for the new x and y position. 
+     */
+    public void setCenter(double[] pos)
+    {
+    	centerX = pos[0];
+    	centerY = pos[1];
+    }
 
     /**
      * Get the center position
