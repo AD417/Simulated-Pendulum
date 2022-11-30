@@ -230,8 +230,8 @@ public class Bob {
     {
         // U(g) = m * g * h
         // h = l * (1 - cos(theta))
-        // TODO: determine how to determine the gravity of the simualtion.
-        return mass * 9.81 * (rodLength * getYDisplacement());
+        // TODO: determine how to determine the gravity of the simulation.
+        return mass * Config.gravity * getYDisplacement();
     }
 
     /**
@@ -241,7 +241,9 @@ public class Bob {
      */
     public double getPotentialEnergy(double height)
     {
-        return mass * 9.81 * (height + rodLength * getYDisplacement());
+        return mass * 
+        		Config.gravity * 
+        		(height + rodLength * getYDisplacement());
     }
     
     /**
@@ -250,8 +252,8 @@ public class Bob {
      */
     public double getVelocity() 
     {
-    	// v = 2 * pi * r * w
-    	return 2 * Math.PI * rodLength * thetaPrime;
+    	// v = r * w
+    	return rodLength * thetaPrime;
     }
 
     /**
