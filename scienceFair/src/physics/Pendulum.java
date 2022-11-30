@@ -40,6 +40,18 @@ public class Pendulum
     int ticks = 0;
 
     boolean isRendering = false;
+    
+    /**
+     * The initial energy of the simulation. 
+     */
+    double initialTotalEnergy;
+    
+    /**
+     * The accuracy of the simulation over time. 
+     * This will decrease exponentially, if slowly, for every tick
+     * that occurs. 
+     */
+    double cumulativeAccuracy = 1;
 
     public Pendulum(double rodLength, double mass) throws Exception
     {
@@ -53,7 +65,9 @@ public class Pendulum
         frame.setTitle("Pendulum Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		solver = new RungeKutta(new ODE());
+		solver = new ModifiedEulersMethod(new ODE());
+		
+		initialTotalEnergy = getTotalEnergy();
     }
     
     /**
@@ -83,7 +97,7 @@ public class Pendulum
     }
     
     /**
-     * Half of a differential equation solver. The other half can be 
+     * Half of an iterative	equation solver. The other half can be 
      * changed as needed while the simulation runs. <br>
      * <br>
      * Collects data points relevant for the equation solving in one
@@ -157,7 +171,6 @@ public class Pendulum
     	@Override
     	public void setVars(double[] vars)
     	{
-    		// if (_vars.length != vars.length) throw new Exception("Invalid sim configuration!");
     		bob.setTheta(vars[0]);
     		bob.thetaPrime = vars[1];
     		
@@ -241,6 +254,10 @@ public class Pendulum
         return bob.mass;
     }
     
+    public double getTotalEnergy()
+    {
+    	return bob.getKineticEnergy() + bob.getPotentialEnergy();
+    }
     
     
     /**
@@ -269,7 +286,11 @@ public class Pendulum
     	Timer timer = new Timer((int) Config.tickSize, new ActionListener() {
     	    @Override
     	    public void actionPerformed(ActionEvent e) {
+    	    	double oldE = getTotalEnergy();
     	        tick(Config.tickSize / 1000);
+    	        cumulativeAccuracy *= 1 - Math.abs(getTotalEnergy() - oldE) / oldE;
+    	        System.out.println(cumulativeAccuracy);
+    	        // System.out.println(getTotalEnergy());
     	        if (++ticks % 25 == 0) render();
     	    }
     	});

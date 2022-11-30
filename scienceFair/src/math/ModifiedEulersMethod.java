@@ -3,7 +3,7 @@ package math;
 import physics.AbstractODE;
 
 /**
- * Half of a differential equation solver. The other half is provided
+ * Half of an iterative equation solver. The other half (sim delta) is provided
  * by whatever simulation we are using. <br>
  * <br>
  * A modification of the normal Euler's Method that helps the stability

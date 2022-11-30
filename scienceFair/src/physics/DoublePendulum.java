@@ -191,7 +191,7 @@ public class DoublePendulum {
     		// Theta1's Change
     		change[0] = dth1;
     		
-    		// Lots of magic numbers here. 
+    		// Lots of magic numbers here. Credit to myphysicslab for this. 
     		double thetaPrimeChange = -g*(2*m1+m2)*Math.sin(th1);
     		thetaPrimeChange -= g*m2*Math.sin(th1-2*th2);
     		thetaPrimeChange -= 2*m2*dth2*dth2*L2*Math.sin(th1-th2);
@@ -232,7 +232,24 @@ public class DoublePendulum {
     	}
     }
 
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     /**
      * Events that should occur on every tick to maintain the simulation.
      * @param tickTime the amount of real time (in seconds) that passes.
