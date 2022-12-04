@@ -4,15 +4,13 @@ import java.awt.*;
 import java.awt.geom.Line2D;
 import java.text.DecimalFormat;
 
+import math.Vector;
+
 public class Bob {
     /**
      * Position of the center. Default (0,0)
      */
-    double centerX = 0;
-    /**
-     * Position of the center. Default (0,0)
-     */
-    double centerY = 0;
+    Vector center = new Vector();
 
     /**
      * Angle off from the lowest point. Default 3.1415...
@@ -48,8 +46,7 @@ public class Bob {
         throws Exception
     {
         this(_rodLength, _mass);
-        centerX = x;
-        centerY = y;
+        center = new Vector(x, y);
     }
 
     public Bob(double x, double y, double _rodLength, double _theta, 
@@ -66,18 +63,16 @@ public class Bob {
      */
     public void setCenter(double x, double y)
     {
-        centerX = x;
-        centerY = y;
+        center = new Vector(x, y);
     }
     
     /**
      * Set the new center of the circle this bob rotates around.
      * @param pos a pair of doubles for the new x and y position. 
      */
-    public void setCenter(double[] pos)
+    public void setCenter(Vector pos)
     {
-    	centerX = pos[0];
-    	centerY = pos[1];
+    	center = new Vector(pos.x, pos.y);
     }
 
     /**
@@ -85,9 +80,9 @@ public class Bob {
      * @return A list of 2 doubles giving the (x, y) position of 
      * the position the bob rotates around.
      */
-    public double[] getCenter()
+    public Vector getCenter()
     {
-        return new double[] {centerX, centerY};
+        return new Vector(center.x, center.y);
     }
 
     /**
@@ -184,7 +179,7 @@ public class Bob {
      */
     public double getMinimumHeight()
     {
-        return centerY - rodLength;
+        return center.y - rodLength;
     }
 
     /**
@@ -193,7 +188,7 @@ public class Bob {
      */
     public double getX()
     {
-        return centerX + (rodLength * Math.sin(theta));
+        return center.x + (rodLength * Math.sin(theta));
     }
 
     /**
@@ -202,7 +197,7 @@ public class Bob {
      */
     public double getY()
     {
-        return centerY - rodLength * Math.cos(theta);
+        return center.y - rodLength * Math.cos(theta);
     }
 
     /**
@@ -218,9 +213,9 @@ public class Bob {
      * Get the current position of the bob
      * @return a list of doubles giving the (x,y) position of the bob.
      */
-    public double[] getPosition()
+    public Vector getPosition()
     {
-        return new double[] {getX(), getY()};
+        return new Vector(getX(), getY());
     }
 
     /**
@@ -294,30 +289,30 @@ public class Bob {
 		g.setStroke(
             new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
         );
-        double[] center = getCenter();
-        double[] pos = getPosition();
-        for (int i = 0; i < 2; i++)
-        {
-            center[i] = -50 * center[i] + 250;
-            pos[i] = -50 * pos[i] + 250;
-        }
-        g.draw(new Line2D.Double(center[0], center[1], pos[0], pos[1]));
+        Vector center = getCenter();
+        Vector pos = getPosition();
+
+        center.x = -50 * center.x + 250;
+        pos.x = -50 * pos.x + 250;
+        center.y = -50 * center.y + 250;
+        pos.y = -50 * pos.y + 250;
+        g.draw(new Line2D.Double(center.x, center.y, pos.x, pos.y));
     }
 
     public void drawBob(Graphics2D g)
     {
-        double[] pos = getPosition();
-        pos[1] = -50 * pos[1] + 250;
-        pos[0] = -50 * pos[0] + 250;
-        g.fillOval((int)pos[0] - 10, (int)pos[1] - 10, 20, 20);
+        Vector pos = getPosition();
+        pos.x = -50 * pos.x + 250;
+        pos.y = -50 * pos.y + 250;
+        g.fillOval((int)pos.x - 10, (int)pos.y - 10, 20, 20);
     }
 
     @Override
     public String toString()
     {
         DecimalFormat f = new DecimalFormat("0.00");
-        double[] pos = getPosition();
-        String out = "Bob{(" + f.format(pos[0]) + "," + f.format(pos[1]) + "),";
+        Vector pos = getPosition();
+        String out = "Bob{(" + f.format(pos.x) + "," + f.format(pos.y) + "),";
         out += "t=" + f.format(theta) + ",l=" + f.format(rodLength) + "}";
         return out;
     }
