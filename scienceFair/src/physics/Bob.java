@@ -18,6 +18,8 @@ public class Bob {
      * Angle off from the lowest point. Default 3.1415...
      */
     double theta = 0;
+    
+    double oldTheta = 0;
 
     /**
      * Change in angle per second.

@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -35,6 +36,7 @@ public class DoublePendulum {
 	 * to swing freely. 
 	 */
 	Bob bob2;
+	
 
     /**
      * The screen the simulation is rendered on. 
@@ -50,14 +52,26 @@ public class DoublePendulum {
 
     boolean isRendering = false;
     
+    /**
+     * The initial energy of the simulation. 
+     */
+    double initialTotalEnergy;
+    
+    /**
+     * The accuracy of the simulation over time. 
+     * This will decrease exponentially, if slowly, for every tick
+     * that occurs. 
+     */
+    double cumulativeAccuracy = 1;
+    
     public DoublePendulum(double l1, double m1, double l2, double m2) 
     		throws Exception
     {
         bob1 = new Bob(l1, m1);
         bob2 = new Bob(l2, m2);
-        bob1.setTheta(Math.PI);
-        bob2.setTheta(Math.PI);
-        bob2.setTheta(-0.001);
+        bob1.setTheta(0);
+        bob2.setTheta(Math.PI / 2);
+        bob2.setThetaPrime(-0.001);
 		bob2.setCenter(bob1.getPosition());
 
         frame = new JFrame();
@@ -66,8 +80,9 @@ public class DoublePendulum {
 		frame.setVisible(true);
         frame.setTitle("Double Pendulum Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		solver = new RungeKutta(new ODE());
 		
-		solver = new ModifiedEulersMethod(new ODE());
+		initialTotalEnergy = getTotalEnergy();
     }
     
     /**
@@ -112,8 +127,7 @@ public class DoublePendulum {
      *
      */
     public class ODE extends AbstractODE
-    {
-    	
+    {	
     	/**
     	 * 
     	 * Compile a list containing all the important variables in this sim.
@@ -222,6 +236,10 @@ public class DoublePendulum {
     	@Override
     	public void setVars(double[] vars)
     	{
+    		bob1.oldTheta = bob1.theta;
+    		bob2.oldTheta = bob2.theta;
+    		bob1.thetaPrime = bob1.thetaPrime;
+    		bob2.thetaPrime = bob2.thetaPrime;
     		// if (_vars.length != vars.length) throw new Exception("Invalid sim configuration!");
     		bob1.setTheta(vars[0]);
     		bob1.thetaPrime = vars[1];
@@ -248,7 +266,25 @@ public class DoublePendulum {
     
     
     
-    
+    public double getTotalEnergy()
+    {
+    	double dt2 = Math.pow(Config.tickSize / 1000, 2);
+		double x1 =      bob1.rodLength * Math.sin(bob1.theta);
+		double y1 =    - bob1.rodLength * Math.cos(bob1.theta);
+		double x2 = x1 + bob2.rodLength * Math.sin(bob2.theta);
+		double y2 = y1 - bob2.rodLength * Math.cos(bob2.theta);
+
+		double dx1 = x1 - bob1.rodLength * Math.sin(bob1.oldTheta);
+		double dy1 = y1 + bob1.rodLength * Math.cos(bob1.oldTheta);
+		double dx2 = x2 - (bob1.rodLength * Math.sin(bob1.oldTheta) + bob2.rodLength * Math.sin(bob2.oldTheta));
+		double dy2 = y2 + (bob1.rodLength * Math.cos(bob1.oldTheta) + bob2.rodLength * Math.cos(bob2.oldTheta));
+		double T1 = 0.5 * bob1.mass * (dx1 * dx1 + dy1 * dy1) / (4 * dt2);
+		double T2 = 0.5 * bob2.mass * (dx2 * dx1 + dy2 * dy1) / (4 * dt2);
+		double V1 = - bob1.mass * Config.gravity * bob1.rodLength * Math.cos(bob1.theta);
+		double V2 = - bob1.mass * Config.gravity * (bob1.rodLength * Math.cos(bob1.theta) + bob2.rodLength * Math.cos(bob2.rodLength));
+		
+		return T1 + T2 + V1 + V2;
+    }
     
     /**
      * Events that should occur on every tick to maintain the simulation.
@@ -272,13 +308,20 @@ public class DoublePendulum {
      */
     public void loop()
     {
+    	printEnergyInfo();
     	// TODO: Figure out how to make the timer do non-int ticks. 
     	Timer timer = new Timer((int) Config.tickSize, new ActionListener() {
     	    @Override
     	    public void actionPerformed(ActionEvent e) {
+    	    	double oldE = getTotalEnergy();
     	        tick(Config.tickSize / 1000);
+    	        //cumulativeAccuracy *= 1 - Math.abs(getTotalEnergy() - oldE) / oldE;
+    	        // System.out.println(cumulativeAccuracy);
     	        if (++ticks % 25 == 0) {
     	        	render();
+    	        	System.out.println(getTotalEnergy());
+        	        // printEnergyInfo();
+        	        // if (ticks > 100) System.exit(0);
     	        }
     	    }
     	});
@@ -287,11 +330,11 @@ public class DoublePendulum {
 
     public static void main(String[] args) throws Exception
     {
-        DoublePendulum p = new DoublePendulum(4, 1.0, 1.5, 3.0);
+        DoublePendulum p = new DoublePendulum(1, 0.1, 2.5, 30.0);
         p.loop();
     }
     
-    @Override
+    // @Override
     public String toString()
     {
     	String out = "DoublePendulum{Bob1: " + 
@@ -300,5 +343,17 @@ public class DoublePendulum {
     			bob2.toString() + 
     			"}";
     	return out;
+    }
+    
+    public void printEnergyInfo()
+    {
+        DecimalFormat f = new DecimalFormat("000.00");
+    	String out = "PE1: " + f.format(bob1.getPotentialEnergy()) + ", ";
+    	out += "KE1: " + f.format(bob1.getKineticEnergy()) + ", ";
+    	// out += "TE1: " + f.format(bob1.getTotalEnergy()) + ", ";
+    	out += "PE2: " + f.format(bob2.getPotentialEnergy()) + ", ";
+    	out += "KE2: " + f.format(bob2.getKineticEnergy()) + ", ";
+    	// out += "TE2: " + f.format(bob2.getTotalEnergy()) + ", ";
+    	System.out.println(out);
     }
 }
