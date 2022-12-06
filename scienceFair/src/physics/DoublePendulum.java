@@ -37,6 +37,7 @@ public class DoublePendulum {
 	 */
 	Bob bob2;
 	
+	double[] energy = new double[4];
 
     /**
      * The screen the simulation is rendered on. 
@@ -247,6 +248,36 @@ public class DoublePendulum {
     		bob2.thetaPrime = vars[3];
     		
     		bob2.setCenter(bob1.getPosition());
+    		
+    		final double  theta1 = vars[0];
+			final double  sinTheta1 = Math.sin(theta1);
+			final double  cosTheta1 = Math.cos(theta1);
+			final double  theta2 = vars[2];
+			final double  sinTheta2 = Math.sin(theta2);
+			final double  cosTheta2 = Math.cos(theta2);
+			final double  L1 = bob1.rodLength;
+			final double  L2 = bob2.rodLength;
+			final double  x1 = L1 * sinTheta1;
+			final double  y1 = -L1 * cosTheta1;
+			final double  x2 = x1 + L2 * sinTheta2;
+			final double  y2 = y1 - L2 * cosTheta2;
+			// final double bob1_.setPosition(new Vector(x1,  y1));
+			// final double bob2_.setPosition(new Vector(x2,  y2));
+			Vector v1 = new Vector(vars[1]*L1*cosTheta1, vars[1]*L1*sinTheta1);
+			Vector v2 = v1.add(new Vector(vars[3]*L2*cosTheta2, vars[3]*L2*sinTheta2));
+			final double  v1x = vars[1]*L1*cosTheta1;
+			final double  v1y = vars[1]*L1*sinTheta1;
+			final double  v2x = v1x + vars[3]*L2*cosTheta2;
+			final double  v2y = v1y + vars[3]*L2*sinTheta2;
+			
+			// PE1
+			energy[0] = (y1 + bob1.rodLength) * bob1.mass * Config.gravity;
+			// KE1
+			energy[1] = 0.5 * bob1.mass * Math.pow(v1.getMagnitude(), 2);
+			// PE2
+			energy[2] = (y2 + bob1.rodLength + bob2.rodLength) * bob2.mass * Config.gravity;
+			// KE2
+			energy[3] = 0.5 * bob2.mass * Math.pow(v2.getMagnitude(), 2);
     	}
     }
 
@@ -268,22 +299,22 @@ public class DoublePendulum {
     
     public double getTotalEnergy()
     {
-    	double dt2 = Math.pow(Config.tickSize / 1000, 2);
-		double x1 =      bob1.rodLength * Math.sin(bob1.theta);
-		double y1 =    - bob1.rodLength * Math.cos(bob1.theta);
-		double x2 = x1 + bob2.rodLength * Math.sin(bob2.theta);
-		double y2 = y1 - bob2.rodLength * Math.cos(bob2.theta);
-
-		double dx1 = x1 - bob1.rodLength * Math.sin(bob1.oldTheta);
-		double dy1 = y1 + bob1.rodLength * Math.cos(bob1.oldTheta);
-		double dx2 = x2 - (bob1.rodLength * Math.sin(bob1.oldTheta) + bob2.rodLength * Math.sin(bob2.oldTheta));
-		double dy2 = y2 + (bob1.rodLength * Math.cos(bob1.oldTheta) + bob2.rodLength * Math.cos(bob2.oldTheta));
-		double T1 = 0.5 * bob1.mass * (dx1 * dx1 + dy1 * dy1) / (4 * dt2);
-		double T2 = 0.5 * bob2.mass * (dx2 * dx1 + dy2 * dy1) / (4 * dt2);
-		double V1 = - bob1.mass * Config.gravity * bob1.rodLength * Math.cos(bob1.theta);
-		double V2 = - bob1.mass * Config.gravity * (bob1.rodLength * Math.cos(bob1.theta) + bob2.rodLength * Math.cos(bob2.rodLength));
+    	// Credit to Cyip92:
+    	// https://github.com/cyip92/dynamical-system-simulator/blob/main/ChaosDistribution/Position.java#L411 
+    	//double dt2 = Math.pow(Config.tickSize / 1000, 2);
+    	//Vector curr1 = bob1.getPosition();
+    	//Vector curr2 = bob2.getPosition();
+        //
+		//double dx1 = curr1.x - bob1.rodLength * Math.sin(bob1.oldTheta);
+		//double dy1 = curr1.y + bob1.rodLength * Math.cos(bob1.oldTheta);
+		//double dx2 = curr2.x - (bob1.rodLength * Math.sin(bob1.oldTheta) + bob2.rodLength * Math.sin(bob2.oldTheta));
+		//double dy2 = curr2.y + (bob1.rodLength * Math.cos(bob1.oldTheta) + bob2.rodLength * Math.cos(bob2.oldTheta));
+		//double T1 = 0.5 * bob1.mass * (dx1 * dx1 + dy1 * dy1) / (4 * dt2);
+		//double T2 = 0.5 * bob2.mass * (dx2 * dx1 + dy2 * dy1) / (4 * dt2);
+		//double V1 = - bob1.mass * Config.gravity * bob1.rodLength * Math.cos(bob1.theta);
+		//double V2 = - bob1.mass * Config.gravity * (bob1.rodLength * Math.cos(bob1.theta) + bob2.rodLength * Math.cos(bob2.rodLength));
 		
-		return T1 + T2 + V1 + V2;
+		return energy[0] + energy[1] + energy[2] + energy[3];
     }
     
     /**
