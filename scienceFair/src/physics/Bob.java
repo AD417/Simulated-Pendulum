@@ -12,6 +12,8 @@ public class Bob {
      */
     Vector center = new Vector();
 
+    double lowestPoint = 0;
+    
     /**
      * Angle off from the lowest point. Default 3.1415...
      */

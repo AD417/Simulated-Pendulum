@@ -5,6 +5,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import java.io.FileWriter;
+import java.io.IOException;
+
 import java.text.DecimalFormat;
 
 import javax.swing.JComponent;
@@ -65,6 +69,9 @@ public class DoublePendulum {
      */
     double cumulativeAccuracy = 1;
     
+    String output;
+    final String header = "TICK, T1, DT1, T2, DT2, P1, K1, P2, K2, TOTAL";
+    
     public DoublePendulum(double l1, double m1, double l2, double m2) 
     		throws Exception
     {
@@ -82,6 +89,7 @@ public class DoublePendulum {
         frame.setTitle("Double Pendulum Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		solver = new RungeKutta(new ODE());
+		output = header + "\n";
 		
 		initialTotalEnergy = getTotalEnergy();
     }
@@ -339,20 +347,24 @@ public class DoublePendulum {
      */
     public void loop()
     {
-    	printEnergyInfo();
     	// TODO: Figure out how to make the timer do non-int ticks. 
     	Timer timer = new Timer((int) Config.tickSize, new ActionListener() {
     	    @Override
     	    public void actionPerformed(ActionEvent e) {
     	    	double oldE = getTotalEnergy();
     	        tick(Config.tickSize / 1000);
+    	        appendSimState();
     	        //cumulativeAccuracy *= 1 - Math.abs(getTotalEnergy() - oldE) / oldE;
     	        // System.out.println(cumulativeAccuracy);
-    	        if (++ticks % 25 == 0) {
+    	        if (++ticks % 25 == 0 && Config.renderSim) {
     	        	render();
-    	        	System.out.println(getTotalEnergy());
         	        // printEnergyInfo();
         	        // if (ticks > 100) System.exit(0);
+    	        }
+    	        if (ticks > Config.maxTicks)
+    	        {
+    	        	saveToFile("Testcat.csv");
+    	        	System.exit(0);
     	        }
     	    }
     	});
@@ -386,5 +398,38 @@ public class DoublePendulum {
     	out += "KE2: " + f.format(bob2.getKineticEnergy()) + ", ";
     	// out += "TE2: " + f.format(bob2.getTotalEnergy()) + ", ";
     	System.out.println(out);
+    }
+    
+    public void appendSimState()
+    {
+    	// 	  "TICK, T1, DT1,T2,DT2, P1, K1, P2, K2, TOTAL";
+    	output += String.format(
+    			"%d, %f, %f, %f, %f, %f, %f, %f, %f%n", 
+    			ticks, 
+    			bob1.theta,
+    			bob1.thetaPrime,
+    			bob2.theta,
+    			bob2.thetaPrime,
+    			bob1.getPotentialEnergy(),
+    			bob1.getKineticEnergy(),
+    			bob2.getPotentialEnergy(bob1.getY()),
+    			bob2.getKineticEnergy()
+    	);
+    }
+    
+    public void saveToFile(String filePath)
+    {
+        try {
+            // Create a new FileWriter object, passing in the file path
+            FileWriter writer = new FileWriter(filePath);
+
+            // Write data to the file
+            writer.write(output);
+
+            // Close the writer to save the data to the file
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
